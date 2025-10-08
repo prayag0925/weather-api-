@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Today's Weather</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #eef2f3;
+      color: #333;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      color: #2c3e50;
+    }
+
+    input[type="text"] {
+      padding: 12px;
+      width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    button {
+      padding: 12px 18px;
+      font-size: 15px;
+      margin-left: 8px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    #output {
+      margin-top: 30px;
+      font-size: 18px;
+    }
+
+    .msg-error {
+      color: crimson;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Check Weather of Any City </h2>
+
+  <input type="text" id="cityName"/>
+  <button onclick="fetchWeather()">Show Weather</button>
+
+  <div id="output"></div>
+
+  <script>
+    async function fetchWeather() {
+      const city = document.getElementById("cityName").value.trim();
+      const display = document.getElementById("output");
+      display.innerHTML = "";
+
+      if (city === "") {
+        display.innerHTML = '<p class="msg-error"> Please enter a city name.</p>';
+        return;
+      }
+
+      const apiKey = "63f75a270abe499da1e153430250810";
+      const endpoint = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(city)}&aqi=no`;
+
+      try {
+        const weatherData = await fetch(endpoint);
+        if (!weatherData.ok) throw new Error("City not found.");
+
+        const info = await weatherData.json();
+
+        const temperature = info.current.temp_c;
+        const conditionText = info.current.condition.text;
+        const locationCity = info.location.name;
+        const locationCountry = info.location.country;
+
+        display.innerHTML = `
+          <p><strong>City:</strong> ${locationCity}, ${locationCountry}</p>
+          <p><strong>Temperature:</strong> ${temperature}°C</p>
+          <p><strong>Condition:</strong> ${conditionText}</p>
+        `;
+      } catch (err) {
+        display.innerHTML = `<p class="msg-error"> ${err.message}</p>`;
+      }
+    }
+  </script>
+
+</body>
+</html>
